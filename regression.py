@@ -2,6 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 import csv
 import numpy as np
+from numpy.linalg import inv
 import math
 
 
@@ -83,7 +84,18 @@ def regression(dataset, cols, betas):
         mse of the regression model mean square error
     """
     # sperate b0 from betas
-    new_betas = betas.copy()
+
+    if type(betas) is np.ndarray:
+        list3 = []
+        for i in betas:
+            list3.append(i)
+        # print(betas)
+        # new_betas = betas.copy()
+        new_betas = list3
+    else:
+
+        new_betas = betas.copy()
+    # print(new_betas)
     b0 = new_betas[0]
     new_betas.pop(0)
 
@@ -117,7 +129,17 @@ def gradient_descent(dataset, cols, betas):
     RETURNS:
         An 1D array of gradients
     """
-    new_betas = betas.copy()
+    if type(betas) is np.ndarray:
+        list3 = []
+        for i in betas:
+            list3.append(i)
+        # print(betas)
+        # new_betas = betas.copy()
+        new_betas = list3
+    else:
+
+        new_betas = betas.copy()
+#    new_betas = betas.copy()
 
     # sperate the betas[0] from new_betas
     b0 = new_betas[0]
@@ -141,29 +163,24 @@ def gradient_descent(dataset, cols, betas):
             model += float(k) * float(i[int(cols[a])])
             a += 1
 
-        # add the value of the formula to the total sum
-
-
+        # calculate the value from betas[1] to betas[length - 1]
         for z in range(len(new_betas) ):
 
             list1[z] += (model - float(i[0])) * float(i[int(cols[z])])
-            # print(z)
 
+
+        # calculate the gradient of betas[0]
         sum += model - float(i[0])
-#        sum2 += (model - float(i[0])) * float(i[int(cols[a-1])])
         num += 1
 
-#    print(list1)
     list = []
     for z in range(len(new_betas)):
         list1[z] = list1[z] * 2/num
 
     list.append(sum*2/num)
     list = list + list1
-    # print(sum2*2/num)
-    b = 0
 
-    grads = list
+    grads = np.array(list)
     return grads
 
 
@@ -188,11 +205,12 @@ def iterate_gradient(dataset, cols, betas, T, eta):
         # print(i+1)
         # print(betas)
         list =[]
+        a = new_betas.copy()
         for k in range(len(new_betas)):
-            new_betas[k] = new_betas[k] - (gradient_descent(dataset, cols, new_betas)[k])*eta
-            list.append(new_betas[k])
+            new_betas[k] = new_betas[k] - (gradient_descent(dataset, cols, a)[k])*eta
+            list.append('{:.2f}'.format(new_betas[k]))
 
-        print(i+1, regression(dataset,cols,new_betas), list)
+        print(i+1, '{:.2f}'.format(regression(dataset,cols,new_betas)), *list, sep=' ')
         # print(gradient_descent(dataset,cols,betas))
     pass
 
@@ -209,10 +227,49 @@ def compute_betas(dataset, cols):
     RETURNS:
         A tuple containing corresponding mse and several learned betas
     """
-    betas = None
-    mse = None
+    list1 = []
+    y_list = []
+    for row in dataset:
+        list = []
+        list.append(1)
+        y_list.append(float(row[0]))
+        for i in cols:
+            list.append(float(row[int(i)]))
+        list1.append(list)
+    # get the x matrix and the y matrix
+    x_array = np.array(list1)
+    y_array = np.array(y_list)
+
+    x_transpose = np.transpose(x_array)
+
+    best_params = inv(x_transpose.dot(x_array)).dot(x_transpose).dot(y_array)
+
+    betas = best_params
+
+    mse = regression(dataset, cols, betas)
+
     return (mse, *betas)
 
+def compute_betas_helper(dataset, cols):
+    list1 = []
+    y_list = []
+    for row in dataset:
+        list = []
+        list.append(1)
+        y_list.append(float(row[0]))
+        for i in cols:
+            list.append(float(row[int(i)]))
+        list1.append(list)
+    # get the x matrix and the y matrix
+    x_array = np.array(list1)
+    y_array = np.array(y_list)
+
+    x_transpose = np.transpose(x_array)
+
+    best_params = inv(x_transpose.dot(x_array)).dot(x_transpose).dot(y_array)
+
+    betas = best_params
+    return betas
 
 def predict(dataset, cols, features):
     """
@@ -227,7 +284,31 @@ def predict(dataset, cols, features):
     RETURNS:
         The predicted body fat percentage value
     """
-    result = None
+    betas = compute_betas_helper(dataset, cols)
+    # print(betas)
+
+    if type(betas) is np.ndarray:
+        list3 = []
+        for i in betas:
+            list3.append(i)
+        # print(betas)
+        # new_betas = betas.copy()
+        new_betas = list3
+    else:
+
+        new_betas = betas.copy()
+    # print(new_betas)
+    b0 = new_betas[0]
+    new_betas.pop(0)
+    sum = 0
+    for i in range(len(new_betas)):
+        sum += float(new_betas[i]) * (float(features[i]))
+
+    sum += b0
+
+    # print(sum)
+
+    result = sum
     return result
 
 
@@ -260,11 +341,13 @@ if __name__ == '__main__':
     # print(get_dataset('bodyfat.csv'))
     dataset = get_dataset('bodyfat.csv')
     # print_stats(get_dataset('bodyfat.csv'), 1)
-    print(regression(dataset, cols=[2,3], betas=[0,0,0]))
-    print(regression(dataset, cols=[2,3,4], betas=[0,-1.1,-.2,3]))
+    # print(regression(dataset, cols=[2,3], betas=[0,0,0]))
+    # print(regression(dataset, cols=[2,3,4], betas=[0,-1.1,-.2,3]))
     # print('')
     # print(regression(dataset, cols=[2,3,4], betas=[0,-1.1,-.2,3]))
-    print(gradient_descent(dataset, cols=[2,3], betas=[0,0,0]))
-    iterate_gradient(dataset, cols=[1,8], betas=[400,-400,300], T=10, eta=1e-4)
+    # print(gradient_descent(dataset, cols=[2,3], betas=[0,0,0]))
+    # iterate_gradient(dataset, cols=[1,8], betas=[400,-400,300], T=10, eta=1e-4)
+    #print(compute_betas(dataset, cols=[1, 2]))
+    print(predict(dataset, cols=[1, 2], features=[1.0708, 23]))
     ### DO NOT CHANGE THIS SECTION ###
     plot_mse()
