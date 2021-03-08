@@ -4,6 +4,8 @@ import csv
 import numpy as np
 from numpy.linalg import inv
 import math
+import random
+import matplotlib.pyplot as plt
 
 
 # Feel free to import other packages, if needed.
@@ -325,7 +327,51 @@ def synthetic_datasets(betas, alphas, X, sigma):
     RETURNS:
         Two datasets of shape (n,2) - linear one first, followed by quadratic.
     """
-    return None, None
+    #mu, sigma = 0, 0.1  # mean and standard deviation
+
+    # z_i = np.random.normal(0, sigma)
+
+    list= []
+    for k in X:
+        z_i = np.random.normal(0, sigma)
+
+        list1 = []
+        a = float(k[0])
+        sum1 = 0
+        for i in range(len(betas)):
+            if (i == 0):
+                sum1 += betas[0]
+                continue
+            sum1 += betas[i] * k[0]
+
+        sum1 += z_i
+        list1.append(sum1)
+        list1.append(a)
+        list.append(list1)
+
+    return_linear = np.array(list)
+    qudratic_list = []
+
+    for j in X:
+        z_i = np.random.normal(0, sigma)
+
+        list2 = []
+        b = float(j[0])
+        sum2 = 0
+        for h in range(len(alphas)):
+            if i == 0:
+                sum2 += alphas[0]
+                continue
+            sum2 += alphas[h] * j[0] * j[0]
+
+        sum2 += z_i
+        list2.append(sum2)
+        list2.append(b)
+        qudratic_list.append(list2)
+
+    return_quadratic = np.array(qudratic_list)
+
+    return return_linear, return_quadratic
 
 
 def plot_mse():
@@ -335,6 +381,34 @@ def plot_mse():
         matplotlib.use('Agg')
 
     # TODO: Generate datasets and plot an MSE-sigma graph
+    list = []
+    for i in range(1000):
+        list1 = []
+        a = random.uniform(-100, 100)
+        list1.append(a)
+        list.append(list1)
+    X = np.array(list)
+    betas = np.array([3, 4, 5])
+    alphas = np.array([1, 2, 6])
+
+    X_list_linear = []
+    X_list_qua = []
+
+    sigma = (1/10 ** 4)
+
+    s1, s2 = synthetic_datasets(betas, alphas, X, sigma)
+    # s2 = synthetic_datasets(betas, alphas, X, sigma)
+    linear_1 = compute_betas(s1, [0,1])[0]
+    quadratic_1 = compute_betas(s2, [0,1])[0]
+
+    print(compute_betas(s1, [0,1]))
+    X_list_linear.append(linear_1)
+    X_list_qua.append((quadratic_1))
+    #print(s1)
+    print(X_list_linear)
+    print(X_list_qua)
+    #print(s2)
+    # print(a)
 
 
 if __name__ == '__main__':
@@ -347,7 +421,8 @@ if __name__ == '__main__':
     # print(regression(dataset, cols=[2,3,4], betas=[0,-1.1,-.2,3]))
     # print(gradient_descent(dataset, cols=[2,3], betas=[0,0,0]))
     # iterate_gradient(dataset, cols=[1,8], betas=[400,-400,300], T=10, eta=1e-4)
-    #print(compute_betas(dataset, cols=[1, 2]))
-    print(predict(dataset, cols=[1, 2], features=[1.0708, 23]))
+    # print(compute_betas(dataset, cols=[1, 2]))
+    # print(predict(dataset, cols=[1, 2], features=[1.0708, 23]))
+    print(synthetic_datasets(np.array([0, 2]), np.array([0, 1]), np.array([[4]]), 1))
     ### DO NOT CHANGE THIS SECTION ###
     plot_mse()
