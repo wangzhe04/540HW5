@@ -6,6 +6,7 @@ from numpy.linalg import inv
 import math
 import random
 import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 # Feel free to import other packages, if needed.
@@ -388,28 +389,100 @@ def plot_mse():
         list1.append(a)
         list.append(list1)
     X = np.array(list)
-    betas = np.array([3, 4, 5])
-    alphas = np.array([1, 2, 6])
+    betas = np.array([3, 4, 5, 6])
+    alphas = np.array([1, 2, 6, 7])
 
     X_list_linear = []
     X_list_qua = []
+    sigma_list = [1/(10 ** 4), 1/(10 ** 3), 1/(10 ** 2), 1/(10), 1, 10, 10**2, 10**3, 10**4,10**5,]
+    # sigma = (1/(10 ** 4))
 
-    sigma = (1/10 ** 4)
-
-    s1, s2 = synthetic_datasets(betas, alphas, X, sigma)
+    # s1, s2 = synthetic_datasets(betas, alphas, X, sigma)
     # s2 = synthetic_datasets(betas, alphas, X, sigma)
-    linear_1 = compute_betas(s1, [0,1])[0]
-    quadratic_1 = compute_betas(s2, [0,1])[0]
+    # linear_1 = compute_betas(s1, [0,1])[0]
+    # quadratic_1 = compute_betas(s2, [0,1])[0]
 
-    print(compute_betas(s1, [0,1]))
-    X_list_linear.append(linear_1)
-    X_list_qua.append((quadratic_1))
+    # print(compute_betas(s1, [0,1]))
+    # X_list_linear.append(linear_1)
+    # X_list_qua.append((quadratic_1))
+
+    sigma = (1/(10**4))
+    linear_4, quadratic_4 = mse_helper(betas, alphas, X, sigma)
+    X_list_linear.append(linear_4)
+    X_list_qua.append((quadratic_4))
+
+    sigma = (1/(10**3))
+    linear_2, quadratic_2 = mse_helper(betas, alphas, X, sigma)
+    X_list_linear.append(linear_2)
+    X_list_qua.append((quadratic_2))
+
+    sigma = (1 / (10 ** 2))
+    linear_3, quadratic_3 = mse_helper(betas, alphas, X, sigma)
+    X_list_linear.append(linear_3)
+    X_list_qua.append((quadratic_3))
+
+    sigma = (1 / (10 ))
+    linear_4, quadratic_4 = mse_helper(betas, alphas, X, sigma)
+    X_list_linear.append(linear_4)
+    X_list_qua.append((quadratic_4))
+
+    sigma = (1)
+    linear_5, quadratic_5 = mse_helper(betas, alphas, X, sigma)
+    X_list_linear.append(linear_5)
+    X_list_qua.append((quadratic_5))
+
+    sigma = (10)
+    linear_6, quadratic_6 = mse_helper(betas, alphas, X, sigma)
+    X_list_linear.append(linear_6)
+    X_list_qua.append((quadratic_6))
+
+    sigma = (10 **2)
+    linear_7, quadratic_7 = mse_helper(betas, alphas, X, sigma)
+    X_list_linear.append(linear_7)
+    X_list_qua.append((quadratic_7))
+
+    sigma = (10**3)
+    linear_8, quadratic_8 = mse_helper(betas, alphas, X, sigma)
+    X_list_linear.append(linear_8)
+    X_list_qua.append((quadratic_8))
+
+    sigma = (10 ** 4)
+    linear_9, quadratic_9 = mse_helper(betas, alphas, X, sigma)
+    X_list_linear.append(linear_9)
+    X_list_qua.append((quadratic_9))
+
+    sigma = (10 ** 5)
+    linear_10, quadratic_10 = mse_helper(betas, alphas, X, sigma)
+    X_list_linear.append(linear_10)
+    X_list_qua.append((quadratic_10))
     #print(s1)
+    f = plt.figure()
+    plt.plot( sigma_list, X_list_linear,'-o', label = 'linear')
+    plt.plot( sigma_list, X_list_qua, '-o', label='qua')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlabel('Sigma')
+    plt.ylabel('MSE')
+    plt.legend()
+
+    #f.savefig('mse.pdf')
+    plt.show()
     print(X_list_linear)
     print(X_list_qua)
+
+    plt.plot(X_list_linear)
     #print(s2)
     # print(a)
 
+
+
+
+def mse_helper(betas, alphas, X, sigma):
+    s1, s2 = synthetic_datasets(betas, alphas, X, sigma)
+    linear_1 = compute_betas(s1, [1])[0]
+    quadratic_1 = compute_betas(s2, [1])[0]
+
+    return linear_1, quadratic_1
 
 if __name__ == '__main__':
     # print(get_dataset('bodyfat.csv'))
